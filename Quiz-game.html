@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cyber Quiz - Interactive HTML CSS JavaScript Quiz App">
+<title>Cyber Quiz | ANAND CODE LAB</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #060816;
+    --card: rgba(16, 23, 48, 0.78);
+    --card-border: rgba(92, 122, 255, 0.25);
+    --text: #f5f7ff;
+    --muted: #9ca8c7;
+    --primary: #6c63ff;
+    --secondary: #00e5ff;
+    --success: #19e68c;
+    --danger: #ff5470;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(108,99,255,.20), transparent 32%),
+        radial-gradient(circle at 80% 80%, rgba(0,229,255,.14), transparent 32%),
+        var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* Background glow */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .18;
+    pointer-events: none;
+}
+
+body::before {
+    background: var(--primary);
+    top: -100px;
+    left: -100px;
+}
+
+body::after {
+    background: var(--secondary);
+    bottom: -100px;
+    right: -100px;
+}
+
+.app {
+    width: 100%;
+    max-width: 760px;
+    position: relative;
+    z-index: 1;
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.brand small {
+    color: var(--secondary);
+    letter-spacing: 3px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.brand h1 {
+    font-size: clamp(28px, 7vw, 52px);
+    margin-top: 5px;
+    letter-spacing: -1px;
+}
+
+.brand h1 span {
+    color: var(--secondary);
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 26px;
+    padding: clamp(20px, 5vw, 34px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* Start screen */
+.start-screen {
+    text-align: center;
+}
+
+.start-icon {
+    width: 90px;
+    height: 90px;
+    margin: 5px auto 20px;
+    border-radius: 25px;
+    display: grid;
+    place-items: center;
+    font-size: 44px;
+    background: linear-gradient(
+        135deg,
+        rgba(108,99,255,.28),
+        rgba(0,229,255,.15)
+    );
+    border: 1px solid rgba(0,229,255,.25);
+    box-shadow: 0 0 40px rgba(0,229,255,.10);
+}
+
+.start-screen h2 {
+    font-size: clamp(24px, 6vw, 36px);
+    margin-bottom: 10px;
+}
+
+.start-screen p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.info-box {
+    padding: 14px 8px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.07);
+}
+
+.info-box strong {
+    display: block;
+    color: var(--secondary);
+    font-size: 18px;
+}
+
+.info-box span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* Buttons */
+.primary-btn,
+.restart-btn {
+    width: 100%;
+    border: 0;
+    border-radius: 15px;
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), #5148e8);
+    box-shadow: 0 12px 30px rgba(108,99,255,.25);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.primary-btn:hover,
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 35px rgba(108,99,255,.35);
+}
+
+.primary-btn:active,
+.restart-btn:active {
+    transform: scale(.98);
+}
+
+/* Quiz header */
+.quiz-screen {
+    display: none;
+}
+
+.quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.question-number {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.score-pill {
+    padding: 8px 13px;
+    border-radius: 50px;
+    color: var(--secondary);
+    background: rgba(0,229,255,.08);
+    border: 1px solid rgba(0,229,255,.18);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* Progress */
+.progress-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(255,255,255,.07);
+    border-radius: 50px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width .35s ease;
+}
+
+.question {
+    font-size: clamp(21px, 5vw, 30px);
+    line-height: 1.3;
+    margin-bottom: 22px;
+}
+
+.options {
+    display: grid;
+    gap: 12px;
+}
+
+.option {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.035);
+    color: var(--text);
+    border-radius: 15px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.option:hover:not(:disabled) {
+    border-color: rgba(0,229,255,.5);
+    transform: translateX(3px);
+    background: rgba(0,229,255,.06);
+}
+
+.option:disabled {
+    cursor: default;
+}
+
+.option.correct {
+    background: rgba(25,230,140,.12);
+    border-color: var(--success);
+    color: #72f3b9;
+}
+
+.option.wrong {
+    background: rgba(255,84,112,.12);
+    border-color: var(--danger);
+    color: #ff91a5;
+}
+
+.option-letter {
+    display: inline-grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    margin-right: 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.08);
+    font-size: 12px;
+}
+
+/* Next */
+.next-area {
+    margin-top: 20px;
+    display: none;
+}
+
+.next-btn {
+    width: 100%;
+    border: 1px solid rgba(0,229,255,.25);
+    border-radius: 14px;
+    padding: 14px;
+    background: rgba(0,229,255,.07);
+    color: var(--secondary);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* Result */
+.result-screen {
+    display: none;
+    text-align: center;
+}
+
+.result-icon {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
+
+.result-screen h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.result-screen p {
+    color: var(--muted);
+}
+
+.final-score {
+    margin: 25px 0;
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(0,229,255,.05);
+    border: 1px solid rgba(0,229,255,.16);
+}
+
+.final-score strong {
+    display: block;
+    font-size: 54px;
+    color: var(--secondary);
+}
+
+.final-score span {
+    color: var(--muted);
+}
+
+.result-message {
+    margin-bottom: 22px;
+    color: #dce3ff;
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+    body {
+        padding: 12px;
+    }
+
+    .card {
+        border-radius: 20px;
+        padding: 20px 16px;
+    }
+
+    .info-row {
+        gap: 7px;
+    }
+
+    .info-box {
+        padding: 12px 5px;
+    }
+
+    .option {
+        padding: 14px 12px;
+        font-size: 14px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+    <header class="brand">
+        <small>ANAND CODE LAB</small>
+        <h1>CYBER <span>QUIZ</span></h1>
+    </header>
+
+    <section class="card">
+
+        <!-- START SCREEN -->
+        <div class="start-screen" id="startScreen">
+
+            <div class="start-icon">🧠</div>
+
+            <h2>Ready for the Challenge?</h2>
+
+            <p>
+                Test your HTML, CSS and JavaScript knowledge
+                with this interactive coding quiz.
+            </p>
+
+            <div class="info-row">
+                <div class="info-box">
+                    <strong>10</strong>
+                    <span>Questions</span>
+                </div>
+
+                <div class="info-box">
+                    <strong>10</strong>
+                    <span>Points</span>
+                </div>
+
+                <div class="info-box">
+                    <strong>∞</strong>
+                    <span>Fun</span>
+                </div>
+            </div>
+
+            <button class="primary-btn" id="startBtn">
+                START QUIZ 🚀
+            </button>
+
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div class="quiz-screen" id="quizScreen">
+
+            <div class="quiz-top">
+                <span class="question-number" id="questionNumber">
+                    Question 1 / 10
+                </span>
+
+                <span class="score-pill">
+                    Score: <span id="score">0</span>
+                </span>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <h2 class="question" id="question">
+                Question goes here
+            </h2>
+
+            <div class="options" id="options"></div>
+
+            <div class="next-area" id="nextArea">
+                <button class="next-btn" id="nextBtn">
+                    NEXT QUESTION →
+                </button>
+            </div>
+
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div class="result-screen" id="resultScreen">
+
+            <div class="result-icon" id="resultIcon">
+                🏆
+            </div>
+
+            <h2>Quiz Complete!</h2>
+
+            <p>Here's how you performed:</p>
+
+            <div class="final-score">
+                <strong id="finalScore">0/10</strong>
+                <span>Your Final Score</span>
+            </div>
+
+            <p class="result-message" id="resultMessage">
+                Great job!
+            </p>
+
+            <button class="restart-btn" id="restartBtn">
+                PLAY AGAIN 🔄
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<noscript>
+    Please enable JavaScript to play this quiz.
+</noscript>
+
+<script>
+"use strict";
+
+const questions = [
+    {
+        question: "Which language is used to structure a webpage?",
+        options: ["CSS", "HTML", "JavaScript", "Python"],
+        answer: 1
+    },
+    {
+        question: "Which language is mainly used for styling webpages?",
+        options: ["HTML", "CSS", "JavaScript", "SQL"],
+        answer: 1
+    },
+    {
+        question: "Which language makes webpages interactive?",
+        options: ["HTML", "CSS", "JavaScript", "XML"],
+        answer: 2
+    },
+    {
+        question: "Which HTML element is used for the largest heading?",
+        options: ["<heading>", "<h6>", "<h1>", "<head>"],
+        answer: 2
+    },
+    {
+        question: "Which CSS property changes text color?",
+        options: ["font-style", "text-color", "color", "background"],
+        answer: 2
+    },
+    {
+        question: "Which keyword creates a constant in JavaScript?",
+        options: ["let", "var", "const", "constant"],
+        answer: 2
+    },
+    {
+        question: "Which method selects an element using a CSS selector?",
+        options: [
+            "document.find()",
+            "document.querySelector()",
+            "document.select()",
+            "document.getCSS()"
+        ],
+        answer: 1
+    },
+    {
+        question: "Which symbol is used for a JavaScript single-line comment?",
+        options: ["<!-- -->", "//", "##", "**"],
+        answer: 1
+    },
+    {
+        question: "Which HTML tag creates a clickable link?",
+        options: ["<link>", "<url>", "<a>", "<href>"],
+        answer: 2
+    },
+    {
+        question: "Which CSS property controls the space inside an element?",
+        options: ["margin", "padding", "spacing", "inside"],
+        answer: 1
+    }
+];
+
+const startScreen = document.getElementById("startScreen");
+const quizScreen = document.getElementById("quizScreen");
+const resultScreen = document.getElementById("resultScreen");
+
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const questionNumber = document.getElementById("questionNumber");
+const questionElement = document.getElementById("question");
+const optionsElement = document.getElementById("options");
+const scoreElement = document.getElementById("score");
+const progressBar = document.getElementById("progressBar");
+const nextArea = document.getElementById("nextArea");
+
+const finalScore = document.getElementById("finalScore");
+const resultMessage = document.getElementById("resultMessage");
+const resultIcon = document.getElementById("resultIcon");
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    answered = false;
+
+    scoreElement.textContent = score;
+
+    startScreen.style.display = "none";
+    resultScreen.style.display = "none";
+    quizScreen.style.display = "block";
+
+    showQuestion();
+}
+
+function showQuestion() {
+    answered = false;
+    nextArea.style.display = "none";
+
+    const current = questions[currentQuestion];
+
+    questionNumber.textContent =
+        `Question ${currentQuestion + 1} / ${questions.length}`;
+
+    questionElement.textContent = current.question;
+
+    progressBar.style.width =
+        `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+    optionsElement.innerHTML = "";
+
+    current.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "option";
+        button.type = "button";
+
+        const letter = document.createElement("span");
+        letter.className = "option-letter";
+        letter.textContent = String.fromCharCode(65 + index);
+
+        const text = document.createElement("span");
+        text.textContent = option;
+
+        button.appendChild(letter);
+        button.appendChild(text);
+
+        button.addEventListener("click", () => {
+            selectAnswer(index, button);
+        });
+
+        optionsElement.appendChild(button);
+    });
+}
+
+function selectAnswer(selectedIndex, selectedButton) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const correctIndex = questions[currentQuestion].answer;
+    const buttons = optionsElement.querySelectorAll(".option");
+
+    buttons.forEach((button, index) => {
+        button.disabled = true;
+
+        if (index === correctIndex) {
+            button.classList.add("correct");
+        }
+    });
+
+    if (selectedIndex === correctIndex) {
+        score++;
+        scoreElement.textContent = score;
+    } else {
+        selectedButton.classList.add("wrong");
+    }
+
+    nextArea.style.display = "block";
+
+    if (currentQuestion === questions.length - 1) {
+        nextBtn.textContent = "SEE FINAL SCORE 🏆";
+    } else {
+        nextBtn.textContent = "NEXT QUESTION →";
+    }
+}
+
+function nextQuestion() {
+
+    if (!answered) return;
+
+    currentQuestion++;
+
+    if (currentQuestion >= questions.length) {
+        showResult();
+        return;
+    }
+
+    showQuestion();
+}
+
+function showResult() {
+
+    quizScreen.style.display = "none";
+    resultScreen.style.display = "block";
+
+    finalScore.textContent =
+        `${score}/${questions.length}`;
+
+    if (score === questions.length) {
+        resultIcon.textContent = "👑";
+        resultMessage.textContent =
+            "Perfect score! You absolutely crushed it! 🔥";
+    } else if (score >= 8) {
+        resultIcon.textContent = "🏆";
+        resultMessage.textContent =
+            "Excellent! Your coding fundamentals are strong! 🚀";
+    } else if (score >= 5) {
+        resultIcon.textContent = "⚡";
+        resultMessage.textContent =
+            "Good job! Keep practicing and you'll level up! 💻";
+    } else {
+        resultIcon.textContent = "🧠";
+        resultMessage.textContent =
+            "Keep learning! Try again and beat your score! 🔥";
+    }
+}
+
+startBtn.addEventListener("click", startQuiz);
+restartBtn.addEventListener("click", startQuiz);
+nextBtn.addEventListener("click", nextQuestion);
+</script>
+
+</body>
+</html>
